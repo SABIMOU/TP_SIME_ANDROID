@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
+import com.squareup.moshi.Moshi;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -20,14 +21,32 @@ import dagger.hilt.android.internal.lifecycle.DefaultViewModelFactories_Internal
 import dagger.hilt.android.internal.managers.ActivityRetainedComponentManager_LifecycleModule_ProvideActivityRetainedLifecycleFactory;
 import dagger.hilt.android.internal.managers.SavedStateHandleHolder;
 import dagger.hilt.android.internal.modules.ApplicationContextModule;
+import dagger.hilt.android.internal.modules.ApplicationContextModule_ProvideContextFactory;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.DoubleCheck;
+import dagger.internal.IdentifierNameString;
+import dagger.internal.KeepFieldType;
+import dagger.internal.LazyClassKeyMap;
 import dagger.internal.Preconditions;
+import dagger.internal.Provider;
+import fr.mastersid.etudiant.template.data.local.dao.AppDao;
+import fr.mastersid.etudiant.template.data.local.database.AppDatabase;
+import fr.mastersid.etudiant.template.data.remote.api.StackOverflowApiService;
+import fr.mastersid.etudiant.template.data.repository.RemoteQuestionsRepository;
+import fr.mastersid.etudiant.template.di.DatabaseModule_ProvideDaoFactory;
+import fr.mastersid.etudiant.template.di.DatabaseModule_ProvideDatabaseFactory;
+import fr.mastersid.etudiant.template.di.NetworkModule_ProvideApiServiceFactory;
+import fr.mastersid.etudiant.template.di.NetworkModule_ProvideMoshiFactory;
+import fr.mastersid.etudiant.template.di.NetworkModule_ProvideOkHttpClientFactory;
+import fr.mastersid.etudiant.template.di.NetworkModule_ProvideRetrofitFactory;
+import fr.mastersid.etudiant.template.presentation.items.QuestionsViewModel;
+import fr.mastersid.etudiant.template.presentation.items.QuestionsViewModel_HiltModules;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Generated;
-import javax.inject.Provider;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
 
 @DaggerGenerated
 @Generated(
@@ -49,25 +68,20 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
     return new Builder();
   }
 
-  public static MyApplication_HiltComponents.SingletonC create() {
-    return new Builder().build();
-  }
-
   public static final class Builder {
+    private ApplicationContextModule applicationContextModule;
+
     private Builder() {
     }
 
-    /**
-     * @deprecated This module is declared, but an instance is not used in the component. This method is a no-op. For more, see https://dagger.dev/unused-modules.
-     */
-    @Deprecated
     public Builder applicationContextModule(ApplicationContextModule applicationContextModule) {
-      Preconditions.checkNotNull(applicationContextModule);
+      this.applicationContextModule = Preconditions.checkNotNull(applicationContextModule);
       return this;
     }
 
     public MyApplication_HiltComponents.SingletonC build() {
-      return new SingletonCImpl();
+      Preconditions.checkBuilderRequirement(applicationContextModule, ApplicationContextModule.class);
+      return new SingletonCImpl(applicationContextModule);
     }
   }
 
@@ -357,12 +371,12 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
 
     @Override
     public DefaultViewModelFactories.InternalFactoryFactory getHiltInternalFactoryFactory() {
-      return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(Collections.<Class<?>, Boolean>emptyMap(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
+      return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(getViewModelKeys(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
     }
 
     @Override
     public Map<Class<?>, Boolean> getViewModelKeys() {
-      return Collections.<Class<?>, Boolean>emptyMap();
+      return LazyClassKeyMap.<Boolean>of(Collections.<String, Boolean>singletonMap(LazyClassKeyProvider.fr_mastersid_etudiant_template_presentation_items_QuestionsViewModel, QuestionsViewModel_HiltModules.KeyModule.provide()));
     }
 
     @Override
@@ -383,6 +397,14 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
     @Override
     public void injectMainActivity(MainActivity mainActivity) {
     }
+
+    @IdentifierNameString
+    private static final class LazyClassKeyProvider {
+      static String fr_mastersid_etudiant_template_presentation_items_QuestionsViewModel = "fr.mastersid.etudiant.template.presentation.items.QuestionsViewModel";
+
+      @KeepFieldType
+      QuestionsViewModel fr_mastersid_etudiant_template_presentation_items_QuestionsViewModel2;
+    }
   }
 
   private static final class ViewModelCImpl extends MyApplication_HiltComponents.ViewModelC {
@@ -392,23 +414,73 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
 
     private final ViewModelCImpl viewModelCImpl = this;
 
+    private Provider<QuestionsViewModel> questionsViewModelProvider;
+
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
         ActivityRetainedCImpl activityRetainedCImpl, SavedStateHandle savedStateHandleParam,
         ViewModelLifecycle viewModelLifecycleParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
 
+      initialize(savedStateHandleParam, viewModelLifecycleParam);
 
     }
 
+    private RemoteQuestionsRepository remoteQuestionsRepository() {
+      return new RemoteQuestionsRepository(singletonCImpl.provideApiServiceProvider.get(), singletonCImpl.provideDaoProvider.get());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initialize(final SavedStateHandle savedStateHandleParam,
+        final ViewModelLifecycle viewModelLifecycleParam) {
+      this.questionsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
+    }
+
     @Override
-    public Map<Class<?>, Provider<ViewModel>> getHiltViewModelMap() {
-      return Collections.<Class<?>, Provider<ViewModel>>emptyMap();
+    public Map<Class<?>, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
+      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(Collections.<String, javax.inject.Provider<ViewModel>>singletonMap(LazyClassKeyProvider.fr_mastersid_etudiant_template_presentation_items_QuestionsViewModel, ((Provider) questionsViewModelProvider)));
     }
 
     @Override
     public Map<Class<?>, Object> getHiltViewModelAssistedMap() {
       return Collections.<Class<?>, Object>emptyMap();
+    }
+
+    @IdentifierNameString
+    private static final class LazyClassKeyProvider {
+      static String fr_mastersid_etudiant_template_presentation_items_QuestionsViewModel = "fr.mastersid.etudiant.template.presentation.items.QuestionsViewModel";
+
+      @KeepFieldType
+      QuestionsViewModel fr_mastersid_etudiant_template_presentation_items_QuestionsViewModel2;
+    }
+
+    private static final class SwitchingProvider<T> implements Provider<T> {
+      private final SingletonCImpl singletonCImpl;
+
+      private final ActivityRetainedCImpl activityRetainedCImpl;
+
+      private final ViewModelCImpl viewModelCImpl;
+
+      private final int id;
+
+      SwitchingProvider(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
+          ViewModelCImpl viewModelCImpl, int id) {
+        this.singletonCImpl = singletonCImpl;
+        this.activityRetainedCImpl = activityRetainedCImpl;
+        this.viewModelCImpl = viewModelCImpl;
+        this.id = id;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public T get() {
+        switch (id) {
+          case 0: // fr.mastersid.etudiant.template.presentation.items.QuestionsViewModel 
+          return (T) new QuestionsViewModel(viewModelCImpl.remoteQuestionsRepository());
+
+          default: throw new AssertionError(id);
+        }
+      }
     }
   }
 
@@ -417,7 +489,7 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
 
     private final ActivityRetainedCImpl activityRetainedCImpl = this;
 
-    private dagger.internal.Provider<ActivityRetainedLifecycle> provideActivityRetainedLifecycleProvider;
+    private Provider<ActivityRetainedLifecycle> provideActivityRetainedLifecycleProvider;
 
     private ActivityRetainedCImpl(SingletonCImpl singletonCImpl,
         SavedStateHandleHolder savedStateHandleHolderParam) {
@@ -442,7 +514,7 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
       return provideActivityRetainedLifecycleProvider.get();
     }
 
-    private static final class SwitchingProvider<T> implements dagger.internal.Provider<T> {
+    private static final class SwitchingProvider<T> implements Provider<T> {
       private final SingletonCImpl singletonCImpl;
 
       private final ActivityRetainedCImpl activityRetainedCImpl;
@@ -482,11 +554,36 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
   }
 
   private static final class SingletonCImpl extends MyApplication_HiltComponents.SingletonC {
+    private final ApplicationContextModule applicationContextModule;
+
     private final SingletonCImpl singletonCImpl = this;
 
-    private SingletonCImpl() {
+    private Provider<Moshi> provideMoshiProvider;
 
+    private Provider<OkHttpClient> provideOkHttpClientProvider;
 
+    private Provider<Retrofit> provideRetrofitProvider;
+
+    private Provider<StackOverflowApiService> provideApiServiceProvider;
+
+    private Provider<AppDatabase> provideDatabaseProvider;
+
+    private Provider<AppDao> provideDaoProvider;
+
+    private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
+      this.applicationContextModule = applicationContextModuleParam;
+      initialize(applicationContextModuleParam);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initialize(final ApplicationContextModule applicationContextModuleParam) {
+      this.provideMoshiProvider = DoubleCheck.provider(new SwitchingProvider<Moshi>(singletonCImpl, 2));
+      this.provideOkHttpClientProvider = DoubleCheck.provider(new SwitchingProvider<OkHttpClient>(singletonCImpl, 3));
+      this.provideRetrofitProvider = DoubleCheck.provider(new SwitchingProvider<Retrofit>(singletonCImpl, 1));
+      this.provideApiServiceProvider = DoubleCheck.provider(new SwitchingProvider<StackOverflowApiService>(singletonCImpl, 0));
+      this.provideDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 5));
+      this.provideDaoProvider = DoubleCheck.provider(new SwitchingProvider<AppDao>(singletonCImpl, 4));
     }
 
     @Override
@@ -506,6 +603,43 @@ public final class DaggerMyApplication_HiltComponents_SingletonC {
 
     @Override
     public void injectMyApplication(MyApplication myApplication) {
+    }
+
+    private static final class SwitchingProvider<T> implements Provider<T> {
+      private final SingletonCImpl singletonCImpl;
+
+      private final int id;
+
+      SwitchingProvider(SingletonCImpl singletonCImpl, int id) {
+        this.singletonCImpl = singletonCImpl;
+        this.id = id;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public T get() {
+        switch (id) {
+          case 0: // fr.mastersid.etudiant.template.data.remote.api.StackOverflowApiService 
+          return (T) NetworkModule_ProvideApiServiceFactory.provideApiService(singletonCImpl.provideRetrofitProvider.get());
+
+          case 1: // retrofit2.Retrofit 
+          return (T) NetworkModule_ProvideRetrofitFactory.provideRetrofit(singletonCImpl.provideMoshiProvider.get(), singletonCImpl.provideOkHttpClientProvider.get());
+
+          case 2: // com.squareup.moshi.Moshi 
+          return (T) NetworkModule_ProvideMoshiFactory.provideMoshi();
+
+          case 3: // okhttp3.OkHttpClient 
+          return (T) NetworkModule_ProvideOkHttpClientFactory.provideOkHttpClient();
+
+          case 4: // fr.mastersid.etudiant.template.data.local.dao.AppDao 
+          return (T) DatabaseModule_ProvideDaoFactory.provideDao(singletonCImpl.provideDatabaseProvider.get());
+
+          case 5: // fr.mastersid.etudiant.template.data.local.database.AppDatabase 
+          return (T) DatabaseModule_ProvideDatabaseFactory.provideDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          default: throw new AssertionError(id);
+        }
+      }
     }
   }
 }

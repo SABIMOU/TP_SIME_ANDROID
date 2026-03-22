@@ -44,6 +44,10 @@ import dagger.hilt.android.scopes.ViewScoped;
 import dagger.hilt.components.SingletonComponent;
 import dagger.hilt.internal.GeneratedComponent;
 import dagger.hilt.migration.DisableInstallInCheck;
+import fr.mastersid.etudiant.template.di.AppModule;
+import fr.mastersid.etudiant.template.di.DatabaseModule;
+import fr.mastersid.etudiant.template.di.NetworkModule;
+import fr.mastersid.etudiant.template.presentation.items.QuestionsViewModel_HiltModules;
 import javax.annotation.processing.Generated;
 import javax.inject.Singleton;
 
@@ -125,9 +129,11 @@ public final class MyApplication_HiltComponents {
   @Component(
       modules = {
           ApplicationContextModule.class,
+          DatabaseModule.class,
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
           ActivityRetainedCBuilderModule.class,
-          ServiceCBuilderModule.class
+          ServiceCBuilderModule.class,
+          NetworkModule.class
       }
   )
   @Singleton
@@ -153,7 +159,8 @@ public final class MyApplication_HiltComponents {
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
           ActivityCBuilderModule.class,
-          ViewModelCBuilderModule.class
+          ViewModelCBuilderModule.class,
+          QuestionsViewModel_HiltModules.KeyModule.class
       }
   )
   @ActivityRetainedScoped
@@ -188,7 +195,11 @@ public final class MyApplication_HiltComponents {
   }
 
   @Subcomponent(
-      modules = HiltWrapper_HiltViewModelFactory_ViewModelModule.class
+      modules = {
+          AppModule.class,
+          HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
+          QuestionsViewModel_HiltModules.BindsModule.class
+      }
   )
   @ViewModelScoped
   public abstract static class ViewModelC implements ViewModelComponent,
